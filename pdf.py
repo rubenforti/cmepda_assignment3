@@ -96,6 +96,20 @@ class ProbabilityDensityFunction(InterpolatedUnivariateSpline):
         return self.ppf(np.random.uniform(size=size))
 
 
+class TestFunctions(unittest.TestCase):
+    """
+    """
+
+    def function(self, x, y, k=3):
+        self.pdf = InterpolatedUnivariateSpline(x, y, k=k)
+
+        ycdf = np.array([self.pdf.integral(x[0], xcdf) for xcdf in x])
+        self.cdf = InterpolatedUnivariateSpline(x, ycdf, k=k)
+
+    def test(self):
+        x1 = self.pdf(x[1])
+        xx1 = self.cdf(x[1])
+        self.assertAlmostEqual(x1, xx1)
 
 
 if __name__ == "__main__":
@@ -103,10 +117,7 @@ if __name__ == "__main__":
     x = np.linspace(0, 2, 1000)
     y = 0.5*x
 
-
-    """
     pdf = ProbabilityDensityFunction(x, y, k=3)
     yy = pdf.rnd(100000)
     plt.hist(yy, 100)
     plt.show()
-    """
