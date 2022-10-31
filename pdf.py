@@ -34,16 +34,18 @@
 #   points
 # - the class should be able to calculate the probability for the random
 #   variable to be included in a generic interval
-# - the class should be able to throw random numbers according to the distribution
-#   that it represents
+# - the class should be able to throw random numbers according to the
+#   distribution that it represents
 # - [optional] how many random numbers do you have to throw to hit the
 #   numerical inaccuracy of your generator?
 
 import numpy as np
+import matplotlib.pyplot as plt
+import unittest
 from scipy.interpolate import InterpolatedUnivariateSpline
 
 
-class ProbabilityDensityFunction:
+class ProbabilityDensityFunction(InterpolatedUnivariateSpline):
 
     """
     Class describing a probability density function.
@@ -55,11 +57,56 @@ class ProbabilityDensityFunction:
           The array of y values to be passed to the pdf.
     """
 
-    def __init__(self, x, y):
-        """Constructor"""
-        curve = InterpolatedUnivariateSpline(x, y, k=3)
+    def __init__(self, x, y, k=3):
+        """Constructor.
+        """
+        # Normalize the pdf, if it is not.
+        norm = InterpolatedUnivariateSpline(x, y, k=k).integral(x[0], x[-1])
+        y /= norm
+        super().__init__(x, y, k=k)
+        ycdf = np.array([self.integral(x[0], xcdf) for xcdf in x])
+        self.cdf = InterpolatedUnivariateSpline(x, ycdf, k=k)
+        # Need to make sure that the vector I am passing to the ppf spline as
+        # the x values has no duplicates --- and need to filter the y
+        # accordingly.
+        xppf, ippf = np.unique(ycdf, return_index=True)
+        yppf = x[ippf]
+        self.ppf = InterpolatedUnivariateSpline(xppf, yppf, k=k)  # Cumulative
+        # density function inverted --- with "x" in "y" place and vice-versa
+
+    def prob(self, x1, x2):
+        """Return the probability for the random variable to be included
+        between x1 and x2.
+        Parameters
+        ----------
+        x1: float or array-like
+            The left bound for the integration.
+        x2: float or array-like
+            The right bound for the integration.
+        """
+        return self.cdf(x2) - self.cdf(x1)
+
+    def rnd(self, size=1000):
+        """Return an array of random values from the pdf.
+        Parameters
+        ----------
+        size: int
+            The number of random numbers to extract.
+        """
+        return self.ppf(np.random.uniform(size=size))
+
+
 
 
 if __name__ == "__main__":
-    x = np.linspace(0, 2, 10)
-    y = 1-0.5*x
+
+    x = np.linspace(0, 2, 1000)
+    y = 0.5*x
+
+
+    """
+    pdf = ProbabilityDensityFunction(x, y, k=3)
+    yy = pdf.rnd(100000)
+    plt.hist(yy, 100)
+    plt.show()
+    """
