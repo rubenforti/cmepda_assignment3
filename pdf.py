@@ -39,9 +39,9 @@
 # - [optional] how many random numbers do you have to throw to hit the
 #   numerical inaccuracy of your generator?
 
+import unittest
 import numpy as np
 import matplotlib.pyplot as plt
-import unittest
 from scipy.interpolate import InterpolatedUnivariateSpline
 
 
@@ -60,31 +60,38 @@ class ProbabilityDensityFunction(InterpolatedUnivariateSpline):
     def __init__(self, x, y, k=3):
         """Constructor.
         """
+
         # Normalize the pdf, if it is not.
         norm = InterpolatedUnivariateSpline(x, y, k=k).integral(x[0], x[-1])
         y /= norm
-        super().__init__(x, y, k=k)
+
+        super().__init__(x, y, k=k)  # Eredita il costruttore dalla classe precedente
+
         ycdf = np.array([self.integral(x[0], xcdf) for xcdf in x])
         self.cdf = InterpolatedUnivariateSpline(x, ycdf, k=k)
+
         # Need to make sure that the vector I am passing to the ppf spline as
         # the x values has no duplicates --- and need to filter the y
         # accordingly.
         xppf, ippf = np.unique(ycdf, return_index=True)
         yppf = x[ippf]
+
         self.ppf = InterpolatedUnivariateSpline(xppf, yppf, k=k)  # Cumulative
         # density function inverted --- with "x" in "y" place and vice-versa
 
-    def prob(self, x1, x2):
-        """Return the probability for the random variable to be included
-        between x1 and x2.
+    def prob(self, x_1, x_2):
+        """
+        Return the probability for the random variable to be included
+        between xA and xB.
+
         Parameters
         ----------
-        x1: float or array-like
+        x_1: float or array-like
             The left bound for the integration.
-        x2: float or array-like
+        x_2: float or array-like
             The right bound for the integration.
         """
-        return self.cdf(x2) - self.cdf(x1)
+        return self.cdf(x_2) - self.cdf(x_1)
 
     def rnd(self, size=1000):
         """Return an array of random values from the pdf.
@@ -98,26 +105,42 @@ class ProbabilityDensityFunction(InterpolatedUnivariateSpline):
 
 class TestFunctions(unittest.TestCase):
     """
+    Class for unit testing
     """
 
-    def function(self, x, y, k=3):
-        self.pdf = InterpolatedUnivariateSpline(x, y, k=k)
+    def _x(self):
+        return np.linspace(0, 1, 1000)
 
-        ycdf = np.array([self.pdf.integral(x[0], xcdf) for xcdf in x])
-        self.cdf = InterpolatedUnivariateSpline(x, ycdf, k=k)
+    def _y(self):
+        return 4*self._x**3
 
-    def test(self):
-        x1 = self.pdf(x[1])
-        xx1 = self.cdf(x[1])
-        self.assertAlmostEqual(x1, xx1)
+    def _p(self):
+        return ProbabilityDensityFunction(self._x, self._y)
+
+    def test_cdf(self):
+        """ Unit testing of CDF """
+        y_test = self._x**4
+        P = self._p()
+        y_cdf = P.cdf(self._x)
+        for i in range(0, 1000):
+            self.assertAlmostEqual(y_test[i], y_cdf[i])
+
+    def test_ppf(self):
+        """ Unit testing of PPF """
+        y_test = self._x**(1/4.)
+        P = self._p()
+        y_ppf = P.ppf(self._x)
+        for i in range(0, 1000):
+            self.assertAlmostEqual(y_ppf[i], y_test[i])
 
 
 if __name__ == "__main__":
-
-    x = np.linspace(0, 2, 1000)
-    y = 0.5*x
-
-    pdf = ProbabilityDensityFunction(x, y, k=3)
+    unittest.main()
+    x_user = np.linspace(0, 1, 1000)
+    y_user = x_user**3
+    pdf = ProbabilityDensityFunction(x_user, y_user, k=3)
     yy = pdf.rnd(100000)
-    plt.hist(yy, 100)
+    plt.plot(x_user, pdf.ppf(x_user))
+    plt.plot(x_user, pdf.cdf(x_user))
+    #plt.plot(x, pdf.ppf(x)+pdf.cdf(x))
     plt.show()
