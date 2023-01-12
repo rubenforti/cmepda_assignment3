@@ -2,7 +2,7 @@
 """ Unit tests for pdf.py module """
 
 import unittest
-# import numpy as np
+import numpy as np
 from pdf import ProbabilityDensityFunction
 
 
