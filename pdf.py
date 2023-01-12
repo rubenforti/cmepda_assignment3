@@ -1,3 +1,4 @@
+# !/usr/bin/env python
 # Copyright (C) 2022 r.forti1@studenti.unipi.it
 #
 # This program is free software: you can redistribute it and/or modify
