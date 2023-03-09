@@ -21,11 +21,12 @@ jobs:
   build-and-test:
     docker:
       - image: cimg/node:16.10
-      - run:
-          name: "Say Hello"
-          command: "echo HELLO WORLD"
+      
     steps:
       - checkout
+      - run:
+          name: "Ciao"
+          command: "echo HELLO WORLD"
       - node/install-packages:
           pkg-manager: npm
       - run:
