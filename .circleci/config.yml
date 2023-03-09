@@ -1,21 +1,27 @@
 version: 2.1
 
+# Define the jobs we want to run for this project
 jobs:
   build:
-    working_directory: ~/circleci-python
     docker:
-      - image: "cimg/python:3.11.1"
+      - image: cimg/<language>:<version TAG>
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
     steps:
       - checkout
-      - run: python pdf.py
+      - run: echo "this is the build job"
   test:
-    working_directory: ~/circleci-python
     docker:
-      - image: "cimg/python:3.11.1"
+      - image: cimg/<language>:<version TAG>
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
     steps:
       - checkout
-      - run: python pdf-test.py
+      - run: echo "this is the test job"
 
+# Orchestrate our job run sequence
 workflows:
   build_and_test:
     jobs:
@@ -23,3 +29,4 @@ workflows:
       - test:
           requires:
             - build
+
