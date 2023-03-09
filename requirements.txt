@@ -5,6 +5,5 @@ numpy==1.23.5
 oauthlib==3.2.2
 pylint==2.16.4
 pytest==7.2.2
-rpm==4.18.0
 scipy==1.10.0
 uproot==5.0.1
