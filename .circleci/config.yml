@@ -34,11 +34,11 @@ jobs:
       - run:
           name: "Ciao"
           command: "echo HELLO WORLD"
-      - python/install-packages:
-          pkg-manager: pip
       - run:
           name: Install ROOT
           command: docker run --rm -it rootproject/root
+      - python/install-packages:
+          pkg-manager: pip
       - run:
           name: Run tests
           command: python -m pytest
