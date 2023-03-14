@@ -7,3 +7,4 @@ pylint==2.16.4
 pytest==7.2.2
 scipy==1.10.0
 uproot==5.0.1
+ROOT==6.24

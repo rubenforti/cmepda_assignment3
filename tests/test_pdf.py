@@ -1,6 +1,7 @@
 
 """ Unit tests for pdf.py module """
 
+import ROOT
 import unittest
 import numpy as np
 from pdf import ProbabilityDensityFunction
