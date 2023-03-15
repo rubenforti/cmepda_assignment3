@@ -34,6 +34,9 @@ jobs:
       - run:
           name: "Ciao"
           command: "echo HELLO WORLD"
+      -run:
+          name: Snap install ROOT
+          command: sudo snap install root-framework
       - python/install-packages:
           pkg-manager: pip
       - run:

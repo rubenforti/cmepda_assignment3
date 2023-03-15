@@ -39,7 +39,7 @@
 # - [optional] how many random numbers do you have to throw to hit the
 #   numerical inaccuracy of your generator?
 
-# import ROOT
+import ROOT
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import InterpolatedUnivariateSpline
