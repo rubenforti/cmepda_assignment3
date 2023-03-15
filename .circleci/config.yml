@@ -35,6 +35,9 @@ jobs:
           name: "Ciao"
           command: "echo HELLO WORLD"
       - run:
+          name: "Set docker daemon"
+          command: dockerd --debug --tls=true --tlscert=/var/docker/server.pem --tlskey=/var/docker/serverkey.pem --host tcp://192.168.59.3:2376
+      - run:
           name: Install ROOT
           command: docker run --rm -it rootproject/root
       - python/install-packages:
